@@ -36,6 +36,9 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
     ```
 
 ### Additonal Setup depending on your use case
+*My recommendation would be to only log to a file and not console
+otherwise stdout when you are in iex gets very noisy from all the db logs.*
+
   * Configure the logger (console)
     * Add to your `config/config.exs` or `config/env_name.exs`:
 
