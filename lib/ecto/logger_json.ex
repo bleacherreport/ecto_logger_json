@@ -1,4 +1,4 @@
-defmodule Ecto.LogEntry do
+defmodule Ecto.LoggerJSON do
   @moduledoc """
   Keep in sync with https://github.com/elixir-ecto/ecto/blob/master/lib/ecto/log_entry.ex
 
