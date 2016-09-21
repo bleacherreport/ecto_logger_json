@@ -17,17 +17,6 @@ defmodule Ecto.LoggerJSON do
   the proper unit by using `System.convert_time_unit/3` before logging.
   """
 
-  alias Ecto.LogEntry
-
-  @type t :: %LogEntry{query: String.t | (t -> String.t), source: String.t | Enum.t | nil,
-                       params: [term], query_time: integer, decode_time: integer | nil,
-                       queue_time: integer | nil, connection_pid: pid | nil,
-                       result: {:ok, term} | {:error, Exception.t},
-                       ansi_color: IO.ANSI.ansicode | nil}
-
-  defstruct query: nil, source: nil, params: [], query_time: nil, decode_time: nil,
-            queue_time: nil, result: nil, connection_pid: nil, ansi_color: nil
-
   require Logger
 
   @doc """
@@ -36,8 +25,37 @@ defmodule Ecto.LoggerJSON do
   The logger call will be removed at compile time if
   `compile_time_purge_level` is set to higher than debug.
   """
+  @spec log(%{}) :: %{}
   def log(entry) do
-    Logger.debug(fn ->
+    :ok = Logger.debug(fn ->
+      %{query_time: query_time, decode_time: decode_time, queue_time: queue_time, query: query} = entry
+      [query_time, decode_time, queue_time] =
+        [query_time, decode_time, queue_time]
+        |> Enum.map(&format_time/1)
+
+      %{
+        "decode_time" => decode_time,
+        "duration"    => Float.round(query_time + decode_time + queue_time, 3),
+        "log_type"    => "persistence",
+        "request_id"  => Logger.metadata[:request_id],
+        "query"       => query,
+        "query_time"  => query_time,
+        "queue_time"  => queue_time
+      }
+      |> Poison.encode!
+    end)
+  entry
+  end
+
+  @doc """
+  Overwritten to use JSON
+  Logs the given entry in the given level.
+  The logger call won't be removed at compile time as
+  custom level is given.
+  """
+  @spec log(%{}, atom) :: %{}
+  def log(entry, level) do
+    :ok = Logger.log(level, fn ->
       %{query_time: query_time, decode_time: decode_time, queue_time: queue_time, query: query} = entry
       [query_time, decode_time, queue_time] =
         [query_time, decode_time, queue_time]
@@ -57,36 +75,9 @@ defmodule Ecto.LoggerJSON do
     entry
   end
 
-  @doc """
-  Overwritten to use JSON
-  Logs the given entry in the given level.
-  The logger call won't be removed at compile time as
-  custom level is given.
-  """
-  def log(entry, level) do
-    Logger.log(level, fn ->
-      %{query_time: query_time, decode_time: decode_time, queue_time: queue_time, query: query} = entry
-      [query_time, decode_time, queue_time] =
-        [query_time, decode_time, queue_time]
-        |> Enum.map(&(Float.round(System.convert_time_unit(&1, :native, :micro_seconds) / 1000, 3)))
-
-      %{
-        "decode_time" => decode_time,
-        "duration"    => Float.round(query_time + decode_time + queue_time, 3),
-        "log_type"    => "persistance",
-        "request_id"  => Logger.metadata[:request_id],
-        "query"       => query,
-        "query_time"  => query_time,
-        "queue_time"  => queue_time
-      }
-      |> Poison.encode!
-    end)
-    entry
-  end
-
   ## Helpers
 
-  defp format_time(nil), do: -1
+  defp format_time(nil), do: 0.0
   defp format_time(time) do
     ms = System.convert_time_unit(time, :native, :micro_seconds) / 1000
     Float.round(ms, 3)

@@ -4,6 +4,7 @@ Log ecto data as JSON with slightly different fields
 
 ## Dependencies
   * Poison
+  * Ecto
 
 ## Installation
 
@@ -31,7 +32,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
     config :my_app, MyApp.Repo,
     adapter: Ecto.Adapters.Postgres,
     ...
-    loggers: [{Ecto.LoggerJSON, :log, [:info]}] 
+    loggers: [{Ecto.LoggerJSON, :log, [:info]}]
     ```
 
 ### Additonal Setup depending on your use case
