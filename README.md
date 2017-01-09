@@ -1,4 +1,7 @@
 # EctoLoggerJson
+[![Hex pm](http://img.shields.io/hexpm/v/ecto_logger_json.svg?style=flat)](https://hex.pm/packages/ecto_logger_json)
+[![Build Status](https://travis-ci.org/bleacherreport/ecto_logger_json.svg?branch=master)](https://travis-ci.org/bleacherreport/ecto_logger_json)
+[![License](https://img.shields.io/badge/license-Apache%202-blue.svg)](https://github.com/bleacherreport/plug_logger_json/blob/master/LICENSE)
 
 Log ecto data as JSON with slightly different fields
 
