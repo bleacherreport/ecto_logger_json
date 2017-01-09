@@ -27,7 +27,7 @@ defmodule Ecto.LoggerJSON do
   """
   @spec log(%{}) :: %{}
   def log(entry) do
-    :ok = Logger.debug(fn ->
+    _ = Logger.debug(fn ->
       %{query_time: query_time, decode_time: decode_time, queue_time: queue_time, query: query} = entry
       [query_time, decode_time, queue_time] =
         [query_time, decode_time, queue_time]
@@ -55,7 +55,7 @@ defmodule Ecto.LoggerJSON do
   """
   @spec log(%{}, atom) :: %{}
   def log(entry, level) do
-    :ok = Logger.log(level, fn ->
+    _ = Logger.log(level, fn ->
       %{query_time: query_time, decode_time: decode_time, queue_time: queue_time, query: query} = entry
       [query_time, decode_time, queue_time] =
         [query_time, decode_time, queue_time]
